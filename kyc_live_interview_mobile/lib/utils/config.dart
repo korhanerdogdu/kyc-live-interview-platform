@@ -6,15 +6,17 @@ class AppConfig {
   // Spring Boot (REST)
   static const String apiOrigin = String.fromEnvironment(
     'API_ORIGIN',
-    // e.g. 'http://192.168.1.33:8080'
-    defaultValue: 'https://0bb4-2a00-1d34-9408-d300-c96d-886b-bb4e-ac6d.ngrok-free.app',
+    // Override with your LAN IP / tunnel, e.g. --dart-define=API_ORIGIN=http://192.168.1.33:8080
+    // Default targets the Android emulator's host loopback.
+    defaultValue: 'http://10.0.2.2:8080',
   );
 
   // netty-socketio (Socket.IO)
   static const String socketOrigin = String.fromEnvironment(
     'SOCKET_ORIGIN',
-    // e.g. 'http://192.168.1.33:8000'
-    defaultValue: 'https://0bb4-2a00-1d34-9408-d300-c96d-886b-bb4e-ac6d.ngrok-free.app',
+    // Override with your LAN IP / tunnel, e.g. --dart-define=SOCKET_ORIGIN=http://192.168.1.33:8000
+    // Default targets the Android emulator's host loopback.
+    defaultValue: 'http://10.0.2.2:8000',
   );
 
   // Path served by your Socket.IO backend.
@@ -24,6 +26,11 @@ class AppConfig {
   // REST base
   static const String apiBase = '$apiOrigin/api';
 
-  // Dev token (same value the web client uses). Replace with a real JWT in prod.
-  static const String jwt = 'aaaaabbbbb1111122222333334444455';
+  // Dev token = the shared symmetric secret the backend checks (see JwtTokenService).
+  // Override via --dart-define=API_TOKEN=... ; must match the backend's JWT_SECRET.
+  // The default is an insecure placeholder — replace with a real JWT flow in prod.
+  static const String jwt = String.fromEnvironment(
+    'API_TOKEN',
+    defaultValue: 'dev-insecure-shared-secret-change-me',
+  );
 }

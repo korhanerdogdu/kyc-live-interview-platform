@@ -16,7 +16,8 @@ public class WebConfiguration implements WebMvcConfigurer {
                         "http://127.0.0.1:*",
                         "https://localhost",
                         "https://127.0.0.1",
-                        "https://0bb4-2a00-1d34-9408-d300-c96d-886b-bb4e-ac6d.ngrok-free.app"
+                        // Add your deployed frontend origin(s) here, e.g. a tunnel:
+                        "https://*.ngrok-free.app"
                 )
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

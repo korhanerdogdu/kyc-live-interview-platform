@@ -40,8 +40,13 @@ const AUDIO_ONLY = { audio: true, video: false };
 
 const log = (...a) => console.log("[RTC]", ...a);
 
+// Token = the shared symmetric secret the backend checks (see JwtTokenService).
+// Override at runtime via localStorage "API_TOKEN" or build-time via REACT_APP_API_TOKEN.
+// The default is an insecure dev placeholder — must match the backend's JWT_SECRET.
 const getAuthToken = () =>
-  localStorage.getItem("API_TOKEN") || "aaaaabbbbb1111122222333334444455";
+  localStorage.getItem("API_TOKEN") ||
+  process.env.REACT_APP_API_TOKEN ||
+  "dev-insecure-shared-secret-change-me";
 
 // -------------------- helpers --------------------
 

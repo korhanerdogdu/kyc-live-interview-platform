@@ -23,8 +23,8 @@ function dataURLMime(dataUrl = '') {
 function getTokenString() {
   const raw = localStorage.getItem('API_TOKEN');
   if (!raw) {
-    // dev fallback
-    return 'aaaaabbbbb1111122222333334444455';
+    // dev fallback — insecure placeholder; must match the backend's JWT_SECRET
+    return process.env.REACT_APP_API_TOKEN || 'dev-insecure-shared-secret-change-me';
   }
   try {
     const obj = JSON.parse(raw);

@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/kyc_db
     username: postgres
-    password: 12345
+    password: ${DB_PASSWORD:12345}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -15,5 +15,5 @@ spring:
 server:
   port: 8080
 jwt:
-  secret: aaaaabbbbb1111122222333334444455
+  secret: ${JWT_SECRET:dev-insecure-shared-secret-change-me}
   expiration: 86400000
