@@ -115,9 +115,17 @@ Explicit ends (`endMeeting` socket event or the REST `/{id}/end`) both converge 
 
 ## Authentication
 
-All layers currently share a single dev JWT secret and a hardcoded dev token for convenience. The socket connection and REST calls both pass the token; the server validates it and reads `subject` and `role` claims (an explicit `role` query param can override for testing).
+Auth is a **shared symmetric secret**, not a real JWT flow yet: the client sends the secret string itself as its bearer token (REST) and as the `token` query param (Socket.IO), and the backend accepts the request when it equals the configured secret (`JwtTokenService.isValid`). In this dev mode the `subject`/`role` are fixed constants, though a `role` query param can override the socket role for testing.
 
-> ⚠️ **Security note:** the committed configs contain a demo `JWT_SECRET`, database password, TLS key material under `*/ssl/`, and an ngrok URL. **Rotate these and move them to environment variables / secrets before any non-local deployment**, and do not treat the checked-in values as safe.
+Because it is symmetric, the **same value must be set in all four places** — backend, web operator panel, web customer flow, and mobile — or auth fails. Each reads from an override with an insecure placeholder default (`dev-insecure-shared-secret-change-me`):
+
+| Layer  | Override                                   | File                              |
+|--------|--------------------------------------------|-----------------------------------|
+| Backend | `JWT_SECRET` env var                       | `application.yml` / `.properties` |
+| Web     | `localStorage["API_TOKEN"]` or `REACT_APP_API_TOKEN` | `socketClient.js`, `customer_api.js` |
+| Mobile  | `--dart-define=API_TOKEN=…`                | `lib/utils/config.dart`           |
+
+> ⚠️ **Security note:** the checked-in default is an intentionally insecure placeholder — it is **not** a real secret and provides no protection. Set a real `JWT_SECRET` (and matching client tokens), and replace this equality check with proper JWT verification, before any non-local deployment. Real secrets belong in `.env` (gitignored — copy `.env.example`), never committed. TLS key material under `*/ssl/` is also gitignored.
 
 ---
 
@@ -136,7 +144,7 @@ sh docker-run.sh        # = docker compose down -v --remove-orphans && docker co
 
 Then open **https://localhost** (self-signed cert — accept the browser warning). It redirects to the operator panel at `/pending-interview`.
 
-Compose provides `JWT_SECRET` and `DB_PASSWORD` from a root `.env` file.
+Compose reads `JWT_SECRET` and `DB_PASSWORD` from a root `.env` file — copy `.env.example` to `.env` first (`.env` is gitignored).
 
 ### Option B — run services individually
 
@@ -176,8 +184,8 @@ flutter run \
 | REST port                        | `application.properties` / `.yml`       | `8080`                      |
 | Socket.IO host/port              | `application.properties` (`socket.*`)   | `0.0.0.0:8000`              |
 | Disconnect grace period          | `app.disconnect-timeout-seconds`        | `60`                        |
-| JWT secret / expiration          | `jwt.secret`, `jwt.expiration`          | dev value / `86400000` ms   |
-| DB URL / user / pass             | `application.yml` / compose `db` service | `kyc_db` / `postgres` / … |
+| JWT secret / expiration          | `JWT_SECRET` env / `jwt.expiration`     | insecure placeholder / `86400000` ms |
+| DB password                      | `DB_PASSWORD` env (`.env`)              | `12345` (dev default)       |
 | Max upload size                  | `spring.servlet.multipart.max-*-size`   | `200MB`                     |
 | Mobile API / socket origin       | `mobile/lib/utils/config.dart` (env)    | overridable via `--dart-define` |
 
@@ -189,7 +197,7 @@ flutter run \
 kyc-live-interview-platform/
 ├── docker-compose.yml              # backend + nginx + postgres
 ├── docker-run.sh / MakeFile        # convenience rebuild scripts
-├── nginx/                          # reverse proxy config + TLS certs
+├── nginx/                          # reverse proxy config (TLS certs are gitignored)
 ├── kyc_live_interview_api/         # Spring Boot backend
 │   └── src/main/java/tr/com/cs/kyc_live_interview_api/
 │       ├── controller/             # MeetingController, exception handler
