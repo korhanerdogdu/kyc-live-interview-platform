@@ -1,0 +1,53 @@
+# ─────────────────────────────────────────────
+# Secrets & credentials  (NEVER commit these)
+# ─────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+**/ssl/
+secrets/
+
+# ─────────────────────────────────────────────
+# Logs
+# ─────────────────────────────────────────────
+logs
+*.log
+*.local
+
+# ─────────────────────────────────────────────
+# Build artifacts
+# ─────────────────────────────────────────────
+# Java / Maven (backend + webrtc_temel)
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Node / React (web)
+node_modules/
+/build/
+dist/
+coverage/
+
+# Flutter / Dart (mobile)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/build/
+*.iml
+
+# ─────────────────────────────────────────────
+# Editor / OS
+# ─────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

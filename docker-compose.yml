@@ -1,0 +1,50 @@
+services:
+  backend:
+    build:
+      context: ./kyc_live_interview_api
+    container_name: kyc-backend
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - db
+    networks:
+      - kyc-net
+
+  nginx:
+    build:
+      context: .                # <-- project root so we can reach the web app
+      dockerfile: nginx/Dockerfile
+    container_name: kyc-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    networks:
+      - kyc-net
+
+  db:
+    image: postgres:17
+    container_name: kyc-db
+    restart: always
+    environment:
+      POSTGRES_DB: kyc_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5433:5432"  #      host portu :: containerdaki port
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - kyc-net
+
+volumes:
+  pgdata:
+
+networks:
+  kyc-net:
